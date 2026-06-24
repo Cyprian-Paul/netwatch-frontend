@@ -1,10 +1,13 @@
 import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../App";
 import api from "../api/client";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [form, setForm] = useState({ username: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
@@ -23,11 +26,11 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <div className="restricted-bar">⚠ SYSTEM ACCESS RESTRICTED — AUTHORIZED USERS ONLY</div>
+      <div className="restricted-bar">SYSTEM ACCESS RESTRICTED — AUTHORIZED USERS ONLY</div>
       <div className="login-grid-bg" />
       <div className="login-left">
         <div className="login-brand">
-          <div className="login-brand-icon">⊙</div>
+          <div className="login-brand-icon">O</div>
           <div className="login-brand-name">NetWatch <span>Pro</span></div>
         </div>
         <h1 className="login-headline">Real-time Network<br />Security Monitoring</h1>
@@ -46,22 +49,65 @@ export default function Login() {
         <div className="login-form-wrap">
           <h2>Authenticate</h2>
           <p>Enter your credentials to access the monitoring dashboard.</p>
-          {error && <div className="login-error">{error}{attempts > 0 && <div className="attempts-warning">Attempt {attempts} of 5</div>}</div>}
+          {error && (
+            <div className="login-error">
+              {error}
+              {attempts > 0 && <div className="attempts-warning">Attempt {attempts} of 5</div>}
+            </div>
+          )}
           <form onSubmit={submit}>
             <div className="form-group">
               <label className="form-label">Username</label>
-              <input className="form-input" value={form.username} onChange={e => setForm({ ...form, username: e.target.value })} placeholder="admin" required />
+              <input
+                className="form-input"
+                value={form.username}
+                onChange={e => setForm({ ...form, username: e.target.value })}
+                placeholder="Enter your username"
+                required
+              />
             </div>
             <div className="form-group">
               <label className="form-label">Password</label>
-              <input type="password" className="form-input" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="••••••••" required />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="form-input"
+                  value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
+                  placeholder="Enter your password"
+                  style={{ paddingRight: 44 }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(s => !s)}
+                  style={{
+                    position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)",
+                    fontSize: 16, padding: 4
+                  }}
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
-            <button className="btn btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: 8 }} disabled={loading}>
+            <button
+              className="btn btn-primary"
+              style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
+              disabled={loading}
+            >
               {loading ? <><span className="spinner" /> Authenticating...</> : "Authenticate"}
             </button>
           </form>
-          <p style={{ marginTop: 20, fontSize: 12, color: "var(--text-muted)", textAlign: "center" }}>
-            Default: <span className="mono text-teal">admin</span> / <span className="mono text-teal">admin123</span>
+          <p style={{ marginTop: 20, fontSize: 13, color: "var(--text-secondary)", textAlign: "center" }}>
+            Don't have an account?{" "}
+            <button
+              onClick={() => navigate("/register")}
+              style={{ background: "none", border: "none", color: "var(--teal)", cursor: "pointer", fontSize: 13, fontWeight: 600, textDecoration: "underline" }}
+            >
+              Create account
+            </button>
           </p>
         </div>
       </div>
